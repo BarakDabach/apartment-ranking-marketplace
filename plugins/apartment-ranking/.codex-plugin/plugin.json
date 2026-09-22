@@ -1,0 +1,36 @@
+{
+  "name": "apartment-ranking",
+  "version": "1.0.5",
+  "description": "Apartment ranking and architectural document ingestion workflows.",
+  "author": {
+    "name": "Barak Dabach",
+    "url": "https://github.com/BarakDabach"
+  },
+  "repository": "https://github.com/BarakDabach/apartment-ranking-marketplace",
+  "keywords": [
+    "apartment-ranking",
+    "floor-plans",
+    "architectural-plans",
+    "real-estate",
+    "excel",
+    "pdf-analysis"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Apartment Ranking",
+    "shortDescription": "Analyze apartment projects from architectural plans.",
+    "longDescription": "A two-skill workflow that turns architectural PDFs and images into a lightweight evidence cache, applies a persistent criteria bank, and builds the apartment-analysis Excel workbook incrementally building by building.",
+    "developerName": "Barak Dabach",
+    "category": "Productivity",
+    "capabilities": [
+      "Analyze architectural PDFs and plan images",
+      "Build reusable apartment scoring workbooks",
+      "Reuse cached evidence when criteria change"
+    ],
+    "defaultPrompt": [
+      "Start a new apartment ranking project from these plans.",
+      "Continue this apartment ranking project building by building."
+    ],
+    "brandColor": "#5B5BD6"
+  }
+}

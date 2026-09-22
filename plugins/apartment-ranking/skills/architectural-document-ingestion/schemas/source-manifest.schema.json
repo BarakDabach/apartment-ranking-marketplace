@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Architectural Source Manifest",
+  "type": "object",
+  "required": ["schema_version", "generated_at_utc", "sources"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1},
+    "generated_at_utc": {"type": "string"},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "original_path", "filename", "sha256", "media_type", "size_bytes", "page_count", "pages"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "original_path": {"type": "string"},
+          "filename": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+          "media_type": {"type": "string"},
+          "size_bytes": {"type": "integer", "minimum": 0},
+          "page_count": {"type": "integer", "minimum": 1},
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["page_number", "native_text_chars", "markdown_path", "preview_path", "apartment_refs", "relevant_for", "review_status"],
+              "properties": {
+                "page_number": {"type": "integer", "minimum": 1},
+                "width_points": {"type": ["number", "null"]},
+                "height_points": {"type": ["number", "null"]},
+                "native_text_chars": {"type": "integer", "minimum": 0},
+                "markdown_path": {"type": "string", "minLength": 1},
+                "preview_path": {"type": "string", "minLength": 1},
+                "page_type": {"type": ["string", "null"]},
+                "plot": {"type": ["string", "number", "null"]},
+                "building": {"type": ["string", "number", "null"]},
+                "floor": {"type": ["string", "number", "null"]},
+                "apartment_refs": {"type": "array"},
+                "north_or_compass_visible": {"type": ["boolean", "null"]},
+                "relevant_for": {"type": "array", "items": {"type": "string"}},
+                "review_status": {"enum": ["unreviewed", "reviewed", "ambiguous"]}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

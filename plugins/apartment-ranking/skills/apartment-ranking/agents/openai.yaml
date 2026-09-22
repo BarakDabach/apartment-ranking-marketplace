@@ -1,0 +1,6 @@
+interface:
+  display_name: "Apartment Ranking"
+  short_description: "Analyze apartment projects from plans into an incremental Excel workbook."
+  default_prompt: "Start or continue an apartment ranking project using the project plans and criteria bank."
+policy:
+  allow_implicit_invocation: true

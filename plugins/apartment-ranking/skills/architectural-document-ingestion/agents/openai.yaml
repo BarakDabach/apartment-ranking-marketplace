@@ -1,0 +1,6 @@
+interface:
+  display_name: "Architectural Document Ingestion"
+  short_description: "Turn architectural PDFs and images into a lightweight reusable evidence cache."
+  default_prompt: "Ingest these architectural PDFs or images into a reusable Markdown, JSON, and WebP evidence cache."
+policy:
+  allow_implicit_invocation: false
