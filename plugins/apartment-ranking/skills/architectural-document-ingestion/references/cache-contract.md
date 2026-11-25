@@ -101,6 +101,14 @@ Recommended reusable fields include:
 - `parking_level`
 - `parking_walking_distance_m`
 - `parking_building_zone`
+- `assigned_storage_id` (raw string incl. qualifier, e.g. `13(B6)`)
+- `storage_level`
+- `storage_cluster_building` (building whose storage cluster holds the number; storage numbering may be per building)
+- `storage_walking_distance_m`
+- `storage_building_zone`
+- `core_point_per_level` (building lobby point in displayed page coordinates, per plan level)
+- `plan_scale_m_per_pt` (calibrated, per sheet)
+- `parking_stall_point` / `storage_point` (located position + method: text layer / glyph decode / manual)
 - `adjacent_external_use`
 - `road_exposure`
 - `garden_or_private_yard`

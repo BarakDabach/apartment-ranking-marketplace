@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0
+
+Merged the lessons of project 2181 (שמורת אלמוגים – חיפה, 15 buildings, 3 plots) into 1.0.5.
+
+- Criteria bank: Quiet v3 (off-plot check against the neighborhood map, mandatory external noise-source checklist, ramp/transformer/sealed-void/meter-cabinet cases), Location on Floor v2 (lobby, shaft-type and amenity-wall rules), Facades boundary rules, Parking Proximity v2 (measurement rule, meters + building-zone note, mixed-level ownership, appendix duplicates, 6↔9 rotated labels), new Storage Proximity v1.
+- Canonical `excel_explanation` texts are the detailed project-2181 wording; score explanations stay short.
+- New Phase -1 Step C: ask whether a טופס ג'4 parking/storage assignment appendix exists before activating parking/storage proximity.
+- Source-link columns are optional per project (asked at setup; default none).
+- Parking / storage proximity workflow for vector common-area plans and bundled `scripts/plan_walk.py` (wall-aware walking distance).
+- Neighborhood overview map added as a source for external exposures.
+- Ingestion: guided DWF ingestion reference; storage/core/scale cache fields.
+
 ## 1.0.5
 
 - Made criterion `display_name` and `excel_explanation` strict canonical cross-project metadata.

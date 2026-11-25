@@ -20,6 +20,7 @@ The plugin contains two skills:
         │   ├── SKILL.md
         │   ├── agents/openai.yaml
         │   ├── references/
+        │   ├── scripts/
         │   └── assets/
         └── architectural-document-ingestion/
             ├── SKILL.md
@@ -91,4 +92,6 @@ python -m pip install -r plugins/apartment-ranking/skills/architectural-document
 ```
 
 If those packages are not available, the skill should use the host's PDF/image capability instead of assuming a machine-specific environment.
+
+The parking/storage walking-distance helper `plugins/apartment-ranking/skills/apartment-ranking/scripts/plan_walk.py` uses the same packages (PyMuPDF + Pillow).
 

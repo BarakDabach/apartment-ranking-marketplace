@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "apartment-ranking",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Analyze apartment projects from architectural documents using cache-first plan ingestion, a reusable criteria bank, traceable evidence, and a standardized Excel ranking workbook.",
   "keywords": [
     "apartment-ranking",

@@ -12,7 +12,7 @@ The skill produces **project-level apartment analysis**. It does not decide the 
 The project's workbook has exactly two sheets:
 
 1. `Lottery` — project metadata.
-2. `Apartments` — apartment facts, selected project-level criteria, and score explanations.
+2. `Apartments` — apartment facts, selected project-level criteria, and score explanations (plus optional source-link columns when the user enables them for the project).
 
 Personalized ranking belongs downstream in the application. In particular, **floor preference is not a project-level criterion**. The raw floor number is stored in `Apartments`, and the application recalculates the floor preference score per user.
 
@@ -198,6 +198,13 @@ After the user confirms a new criterion:
 4. include it in the current project's active criterion set if the user wants it active now.
 
 Do not begin project analysis until every new criterion is fully defined **and persisted into the bank**.
+
+## Step C — Project setup questions
+
+Before generating the workbook, ask:
+
+1. **Parking/storage assignment appendix.** When `parking_proximity` or `storage_proximity` is offered or selected, ask whether the project has a per-apartment parking/storage assignment appendix — typically **טופס/נספח ג'4** of the lottery booklet (apartment → parking ids + level, storage number + level) — and the common-area level plans (parking/storage floors). These two sources are required to measure walking distance to the assigned parking and storage. If the appendix is not available, tell the user that these criteria cannot be measured per apartment; offer to deactivate them or to keep them with blank scores until the appendix is supplied. Never infer assignments from parking/storage numbers alone.
+2. **Source-link columns (optional).** Ask whether the user wants source-link columns in `Apartments` (e.g. `PDF דירה`, `PDF קומות`, `מפת מגרשים`). Default: no link columns. If enabled, confirm the exact column names, record them as the project's link-column convention, and follow the **Optional source-link columns** section.
 
 ---
 
@@ -449,8 +456,8 @@ When the user adds a criterion after one or more buildings have already been ana
 1. Pause analysis of new buildings.
 2. Complete the Criterion Definition Contract.
 3. Persist the new criterion into `references/criteria-bank.md` and save the bank.
-4. Add one new 4-column criterion block immediately after the existing criterion blocks.
-5. Preserve every existing fixed field, criterion block and score.
+4. Add one new 4-column criterion block immediately after the existing criterion blocks (before the source-link columns when the project uses them).
+5. Preserve every existing fixed field, criterion block, score and source link.
 6. Populate the new criterion's:
    - `שם הקריטריון`;
    - `הסבר הקריטריון`
@@ -508,7 +515,7 @@ The canonical workbook seed bundled with this skill is:
 
 This asset is the approved clean project template and is the preferred source for every new project. Clone it; never use a populated workbook from a previous project as the starting template.
 
-The bundled template contains the fixed columns, one placeholder 4-column criterion block, RTL/layout/formatting, and the `Lottery` sheet structure. Expand or contract only the criterion area to match the active criterion set. The `Apartments` sheet must contain **no link/source columns**.
+The bundled template contains the fixed columns, one placeholder 4-column criterion block, RTL/layout/formatting, and the `Lottery` sheet structure. Expand or contract only the criterion area to match the active criterion set. By default the `Apartments` sheet contains **no link/source columns**; add them only when the user enabled them in Phase -1 Step C.
 
 If the template asset cannot be used, recreate the same schema exactly from this contract.
 
@@ -522,7 +529,7 @@ When generating the project workbook from the bundled template:
 4. if more than one criterion is active, duplicate the placeholder block immediately after the previous criterion block, preserving its formatting;
 5. if exactly one criterion is active, reuse the placeholder block as-is;
 6. if zero criteria are explicitly approved, remove the placeholder block so `מחיר` is the final `Apartments` column;
-7. do not create link/source columns of any kind;
+7. do not create link/source columns unless the user enabled them for this project; when enabled, append them after the last criterion block as defined in **Optional source-link columns**;
 8. do not add criterion-specific headers: every criterion block keeps the same four generic headers;
 9. do not populate project data into the template asset itself; always work on a project copy.
 
@@ -634,6 +641,18 @@ The criterion name and generic explanation are **bank-controlled canonical value
 
 ---
 
+# Optional source-link columns
+
+Only when the user enabled them in Phase -1 Step C:
+
+- place them **after the last criterion block**, in the confirmed order (e.g. `PDF דירה | PDF קומות | מפת מגרשים`);
+- never hard-code their Excel letters — the number of criterion blocks is dynamic;
+- when a criterion block is added later, insert it before the link columns and move existing links (value, style, hyperlink) intact;
+- link only to verified local source files/pages or verified URLs; never fabricate a URL;
+- preserve existing links on every update.
+
+---
+
 ---
 
 # Workbook generation validation
@@ -647,8 +666,8 @@ Immediately after generating a new-project workbook, verify:
 5. every selected existing criterion uses the exact bank `display_name` and `excel_explanation` with no project-specific rewording;
 6. there is no floor criterion block;
 6. every criterion block uses the exact generic four headers;
-7. `Apartments` has exactly `13 + (4 × active criterion count)` columns;
-8. there are no link/source columns;
+7. `Apartments` has exactly `13 + (4 × active criterion count) + (link-column count)` columns, where the link-column count is 0 unless enabled;
+8. link/source columns exist only if enabled, and then appear immediately after the final criterion block;
 9. there are no weights or final-ranking columns;
 10. there are no extra analysis sheets;
 11. numeric fields use numeric cell types when data is added.
@@ -690,7 +709,9 @@ Possible sources:
 | Typical floor plans | Core proximity, facades, directions, units per floor |
 | Individual apartment plans | Unit layout, balcony/yard orientation, detailed adjacency |
 | Site/development plan | Building position and external exposures |
-| Parking + storage plans | Parking assignment, parking anomaly, storage position |
+| Parking + storage plans (common-area level plans) | Parking/storage physical location, walking route, building zone |
+| Parking/storage assignment appendix (e.g. טופס ג'4) | Per-apartment parking ids + level and storage number + level; required for parking/storage proximity |
+| Neighborhood overview map / aerial rendering (marketing PNG/JPG) | Off-plot roads, roundabouts, public parks, playgrounds, fitness areas, schools, retail and other external noise sources beyond the plot boundary |
 | Cross-sections | Floor elevations/heights and atypical levels |
 | Spec booklet / apartment list | Unit metadata, sizes, price, storage/parking assignment |
 | Project/listing data | Source URLs and pre-populated apartment facts |
@@ -719,8 +740,8 @@ Use each active criterion's `required_sources` and `required_observations` to de
 Examples:
 
 - directions/facades/location on floor → typical floor + apartment plans;
-- parking proximity → parking assignment source + parking plans;
-- quiet/external exposure → site plan + relevant apartment/floor plan + external context when required;
+- parking / storage proximity → assignment appendix (ג'4) + parking/storage level plans;
+- quiet/external exposure → site plan + relevant apartment/floor plan + external context when required; plot site plans usually stop at the plot boundary, so always cross-check every facade against a neighborhood overview map/aerial when one exists (an adjacent road may be missing from the plot plan), and run the Quiet criterion's mandatory external noise-source checklist (roads, playgrounds, parks, synagogues, schools, kindergartens, sports/fitness areas, retail, venues, bus stops etc.; read the map legend icons) for every building;
 - section-dependent criterion → only relevant sections/elevations.
 
 Classify candidate pages from lightweight previews first. Escalate to the original page/crop only when necessary.
@@ -887,7 +908,30 @@ When needed:
 - measure the practical route, not only straight-line distance;
 - state approximate visual-measurement error.
 
-Do not add a new raw-distance column unless the user changes the workbook contract.
+Do not add a new raw-distance column unless the user changes the workbook contract. The distance (meters) and any other-building-zone note go into `הסבר הציון`.
+
+## Parking / storage proximity workflow (vector common-area plans)
+
+Use this when `parking_proximity` / `storage_proximity` are active and the assignment appendix (ג'4) was supplied (Phase -1 Step C). Proven on project 2181 (15 buildings, ~400 apartments, 3 plots).
+
+1. **Assignment table.** Parse the per-apartment assignment appendix (e.g. ג'4 of the lottery booklet): building, apartment, storage number + level, parking id(s) + level. Normalize levels (`-1`, `-2`, `קרקע`, `קרקע עליון/תחתון`). Keep raw strings; watch for:
+   - mixed levels for one apartment (`(-2),(-1)`) → search both levels; ids are not reliably listed in level order (see bank case_rules);
+   - ranges (`115-120`) → expand or verify manually;
+   - storage qualifiers (`13(B6)`, `(A1) 65`) → see numbering rule below.
+2. **Storage numbering may be per building.** Each building can have its own storage cluster numbered 1..N on the same level, so the same number appears several times. Pick the occurrence nearest the apartment's own core; a qualifier naming another building means "that number in the named building's cluster" (and is itself an other-building-zone note). Never resolve by number alone. If a qualified number does not exist on the stated level but exists near the named building on another level, the assignment level is likely a clerical error — use the plan location and report the discrepancy to the user.
+3. **Locate items on the plans.**
+   - Prefer the PDF text layer (storages, building labels). Text may be reversed (`6B` = B6), zero-padded (`06` = 6) and Hebrew may be missing from the text layer.
+   - Stall numbers are often drawn as vector stroke glyphs, not text. Decode them by template matching of stroke bounding shapes; build templates per plot/drafter (colour, pen width and font differ between plots) and test all 4 orientations (0°, 90°, 180°, 270°) because labels can be rotated or upside down. Report coverage per level. An undecoded stall may be interpolated between decoded consecutive neighbours (N-k, N+j) on the same level when their spacing fits consecutive stalls (≤ ~3.5 m per step); otherwise locate it manually.
+   - Labels rotated 180° decode 6 as 9 and vice versa (60→"90", 106→"109", 136→"139"). A misread both hides the real stall and plants a false duplicate of another id. Before trusting a decode or an interpolation: (a) for an undecoded N, look for a 6↔9-swapped decode whose neighbours N±1/N±2 lie nearby; (b) flag ids with more than one decoded position and resolve them by the neighbour sequence; (c) flag two different ids placed at the same spot. Interpolation can be off by a whole stall (2–5 m) where a row has gaps or ramps; for apartments that are actually scored, verify interpolated stalls visually on a gridded crop and store them as manual points.
+   - Items not in the text layer and not decodable → record manual points in a config file with the evidence crop.
+4. **Cores.** Record the elevator-lobby point of each building **per level** — levels of the same plot are not always drawn in the same frame/offset.
+5. **Scale.** Calibrate from dimension strings on the sheet and cross-check with a stall depth (~5.0 m) / aisle (~6.0 m).
+6. **Route.** Rasterize the vector drawing into a wall mask (wall outlines, column fills, wall hatch fills) and run a shortest path (8-connected Dijkstra) from the lobby to the nearest walkable point of the stall / storage door. Door openings are often drawn closed (threshold lines, door leaves, text, cabinets), so treat walls as passable at a high per-pixel penalty instead of absolute obstacles; report the geometric length of the chosen path, not the penalized cost. Do not route over vehicle ramps. Sanity-check: walking ≥ straight line, typically ≤ 1.6× straight line; inspect outliers on a path overlay. Bundled implementation: `scripts/plan_walk.py` (PyMuPDF + Pillow; `--png` draws the route for review).
+7. **Round and score.** Round to the nearest 5 m and score the rounded value with the bank bands (so the explanation and score agree).
+8. **Zone note.** Add `| באזור בניין X` when the item is >3 m closer (straight line) to another building's core than to the own core, or when the storage qualifier names another building.
+9. **Explanation format:** `כ-{m} מ' הליכה, {level}` + optional zone note, for both parking and storage. Multiple stalls → distance to the nearest; tandem may be mentioned.
+10. **Ownership check.** After a plot is computed, verify that no (level, stall id) and no storage occurrence is assigned to two apartments. A duplicate that exists in the appendix itself is scored as written and noted in the explanation (see bank case_rules); report every duplicate to the user.
+11. Cache per-apartment results (ids, level, located point, walking m, rounded m, zone, score) in the ingestion cache before presenting a building for approval.
 
 ---
 
@@ -991,8 +1035,9 @@ For the approved building:
 2. fill verified fixed fields;
 3. populate every active criterion block;
 4. append any missing apartment rows using the exact workbook schema;
-5. do not modify `Lottery`;
-6. do not modify unrelated buildings.
+5. preserve existing source links when the project uses link columns;
+6. do not modify `Lottery`;
+7. do not modify unrelated buildings.
 
 ## Incremental workbook requirement
 
@@ -1031,7 +1076,7 @@ After every write, verify:
 10. `שם הקריטריון` is consistent across the entire criterion block;
 11. `הסבר הקריטריון` is consistent across the entire criterion block;
 12. there is no floor criterion block;
-13. there are no link/source columns;
+13. link/source columns exist only if enabled for the project, and existing links were preserved;
 14. no unrelated building changed;
 15. `Lottery` is unchanged;
 16. the saved workbook already contains every previously completed building plus the current building.

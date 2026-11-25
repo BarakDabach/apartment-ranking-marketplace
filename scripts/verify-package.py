@@ -39,7 +39,7 @@ if market:
 if manifest:
     if manifest.get("name") != "apartment-ranking":
         errors.append("Portable manifest name mismatch")
-    if manifest.get("version") != "1.0.5":
+    if manifest.get("version") != "1.1.0":
         errors.append("Portable manifest version mismatch")
     if manifest.get("$schema") != "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json":
         errors.append("Portable manifest schema mismatch")
@@ -53,7 +53,7 @@ if manifest:
 if compat:
     if compat.get("skills") != "./skills/":
         errors.append("Compatibility manifest must point skills to ./skills/")
-    if compat.get("version") != "1.0.5":
+    if compat.get("version") != "1.1.0":
         errors.append("Compatibility manifest version mismatch")
 
 # Guard the cross-project canonical criterion identity contract.
@@ -161,5 +161,5 @@ if errors:
 
 print("PACKAGE OK")
 print(f"Repository root: {ROOT}")
-print("Plugin: apartment-ranking 1.0.5")
+print("Plugin: apartment-ranking 1.1.0")
 print("Skills: apartment-ranking, architectural-document-ingestion")

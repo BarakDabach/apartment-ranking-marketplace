@@ -27,6 +27,11 @@ When available, use the platform's PDF capability for authoritative PDF inspecti
 
 OCR is a last resort. Prefer native PDF text extraction and visual inspection of the drawing. Never let OCR override visible geometry, compass orientation, dimensions, or linework.
 
+For user-guided DWF ingestion through Autodesk Design Review, read
+[`references/guided-dwf-ingestion.md`](references/guided-dwf-ingestion.md). Use
+that flow when the user wants to identify relevant sheets and approve extraction
+incrementally instead of relying on autonomous whole-file interpretation.
+
 ## Output contract
 
 Default cache root:
