@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+Works with any skills-compatible agent, not only Codex / ChatGPT.
+
+- Added Claude Code manifests: `.claude-plugin/marketplace.json` (also read by GitHub Copilot in VS Code and Copilot CLI) and `plugins/apartment-ranking/.claude-plugin/plugin.json`.
+- Added `scripts/install-skills.ps1` / `.sh` to copy both skills into Claude, Copilot, Codex, or any custom skills folder, backing up existing copies outside the skills folder.
+- `apartment-ranking` SKILL.md: host-neutral sibling-skill invocation (`$...` / `/...` / read `../architectural-document-ingestion/SKILL.md`) and a rule for bank edits made in a managed plugin install.
+- README: install and usage instructions per agent.
+- Verifier: checks the Claude manifests, a single shared version, and Agent Skills frontmatter (name = directory, description ≤ 1024 characters).
+
 ## 1.1.0
 
 Merged the lessons of project 2181 (שמורת אלמוגים – חיפה, 15 buildings, 3 plots) into 1.0.5.

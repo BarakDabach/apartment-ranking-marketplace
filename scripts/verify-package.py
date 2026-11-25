@@ -9,6 +9,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins" / "apartment-ranking"
+VERSION = "1.2.0"
 errors: list[str] = []
 
 def load_json(path: Path):
@@ -21,6 +22,29 @@ def load_json(path: Path):
 market = load_json(ROOT / ".agents" / "plugins" / "marketplace.json")
 manifest = load_json(PLUGIN / "plugin.json")
 compat = load_json(PLUGIN / ".codex-plugin" / "plugin.json")
+claude_market = load_json(ROOT / ".claude-plugin" / "marketplace.json")
+claude_manifest = load_json(PLUGIN / ".claude-plugin" / "plugin.json")
+
+# Claude Code / GitHub Copilot (VS Code, CLI) marketplace format.
+if claude_market:
+    if claude_market.get("name") != "apartment-ranking-tools":
+        errors.append("Claude marketplace name must be apartment-ranking-tools")
+    if not (claude_market.get("owner") or {}).get("name"):
+        errors.append("Claude marketplace owner.name is required")
+    entries = claude_market.get("plugins") or []
+    if len(entries) != 1 or entries[0].get("name") != "apartment-ranking":
+        errors.append("Claude marketplace must expose exactly the apartment-ranking plugin")
+    else:
+        if entries[0].get("source") != "./plugins/apartment-ranking":
+            errors.append("Claude marketplace source path is not portable")
+        if entries[0].get("version") != VERSION:
+            errors.append("Claude marketplace plugin version mismatch")
+
+if claude_manifest:
+    if claude_manifest.get("name") != "apartment-ranking":
+        errors.append("Claude manifest name mismatch")
+    if claude_manifest.get("version") != VERSION:
+        errors.append("Claude manifest version mismatch")
 
 if market:
     if market.get("name") != "apartment-ranking-tools":
@@ -39,7 +63,7 @@ if market:
 if manifest:
     if manifest.get("name") != "apartment-ranking":
         errors.append("Portable manifest name mismatch")
-    if manifest.get("version") != "1.1.0":
+    if manifest.get("version") != VERSION:
         errors.append("Portable manifest version mismatch")
     if manifest.get("$schema") != "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json":
         errors.append("Portable manifest schema mismatch")
@@ -53,7 +77,7 @@ if manifest:
 if compat:
     if compat.get("skills") != "./skills/":
         errors.append("Compatibility manifest must point skills to ./skills/")
-    if compat.get("version") != "1.1.0":
+    if compat.get("version") != VERSION:
         errors.append("Compatibility manifest version mismatch")
 
 # Guard the cross-project canonical criterion identity contract.
@@ -70,9 +94,13 @@ for skill in ("apartment-ranking", "architectural-document-ingestion"):
     if not skill_md.is_file():
         errors.append(f"Missing {skill}/SKILL.md")
     else:
-        head = skill_md.read_text(encoding="utf-8")[:2500]
-        if f"name: {skill}" not in head:
-            errors.append(f"{skill}/SKILL.md frontmatter name mismatch")
+        # Agent Skills standard (agentskills.io): portable frontmatter only.
+        m = re.match(r"---\r?\n(.*?)\r?\n---", skill_md.read_text(encoding="utf-8"), re.S)
+        fields = dict(re.findall(r"^([A-Za-z-]+):\s*(.*)$", m.group(1), re.M)) if m else {}
+        if fields.get("name") != skill or not re.fullmatch(r"[a-z0-9-]{1,64}", skill):
+            errors.append(f"{skill}/SKILL.md frontmatter name must equal the directory name")
+        if not fields.get("description") or len(fields["description"]) > 1024:
+            errors.append(f"{skill}/SKILL.md description missing or longer than 1024 characters")
     agent = root / "agents" / "openai.yaml"
     if not agent.is_file():
         errors.append(f"Missing {skill}/agents/openai.yaml")
@@ -161,5 +189,5 @@ if errors:
 
 print("PACKAGE OK")
 print(f"Repository root: {ROOT}")
-print("Plugin: apartment-ranking 1.1.0")
+print(f"Plugin: apartment-ranking {VERSION}")
 print("Skills: apartment-ranking, architectural-document-ingestion")

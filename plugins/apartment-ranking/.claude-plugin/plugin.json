@@ -1,0 +1,19 @@
+{
+  "name": "apartment-ranking",
+  "version": "1.2.0",
+  "description": "Analyze apartment projects from architectural documents using cache-first plan ingestion, a reusable criteria bank, traceable evidence, and a standardized Excel ranking workbook.",
+  "author": {
+    "name": "Barak Dabach",
+    "url": "https://github.com/BarakDabach"
+  },
+  "homepage": "https://github.com/BarakDabach/apartment-ranking-marketplace",
+  "repository": "https://github.com/BarakDabach/apartment-ranking-marketplace",
+  "keywords": [
+    "apartment-ranking",
+    "floor-plans",
+    "architectural-plans",
+    "real-estate",
+    "excel",
+    "pdf-analysis"
+  ]
+}

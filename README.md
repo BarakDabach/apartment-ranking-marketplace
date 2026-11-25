@@ -1,6 +1,6 @@
 # Apartment Ranking Plugin Marketplace
 
-Portable repository marketplace for the **Apartment Ranking** plugin.
+Portable repository marketplace for the **Apartment Ranking** plugin. The skills follow the open [Agent Skills](https://agentskills.io/) standard and the package ships manifests for Claude Code, GitHub Copilot (VS Code / CLI), OpenAI Codex, and the [Agent Plugins](https://agent-plugins.org/) format, so it works with any skills-compatible agent.
 
 The plugin contains two skills:
 
@@ -11,10 +11,13 @@ The plugin contains two skills:
 
 ```text
 .
-├── .agents/plugins/marketplace.json
+├── .claude-plugin/marketplace.json      # Claude Code + GitHub Copilot marketplace
+├── .agents/plugins/marketplace.json     # Codex marketplace
+├── scripts/install-skills.ps1|.sh       # plain copy into any agent's skills folder
 └── plugins/apartment-ranking/
-    ├── plugin.json
-    ├── .codex-plugin/plugin.json
+    ├── plugin.json                      # Agent Plugins 1.0 (Copilot, other clients)
+    ├── .claude-plugin/plugin.json       # Claude Code
+    ├── .codex-plugin/plugin.json        # Codex
     └── skills/
         ├── apartment-ranking/
         │   ├── SKILL.md
@@ -31,57 +34,70 @@ The plugin contains two skills:
             └── references/
 ```
 
-## Install from an extracted folder
+## Install
 
-From a terminal with the Codex CLI available:
+The two skills must always be installed together. Pick the route for your agent.
+
+### Claude Code
 
 ```bash
-codex plugin marketplace add /absolute/path/to/this/repository
+claude plugin marketplace add BarakDabach/apartment-ranking-marketplace
+claude plugin install apartment-ranking@apartment-ranking-tools
 ```
 
-On Windows PowerShell you can also run:
+Inside a session the same works with `/plugin marketplace add ...` and `/plugin install ...`. Update later with `claude plugin marketplace update apartment-ranking-tools`.
+
+### GitHub Copilot in VS Code
+
+Run **Chat: Install Plugin from Source** and enter `https://github.com/BarakDabach/apartment-ranking-marketplace`, or add `BarakDabach/apartment-ranking-marketplace` under **Configure Marketplaces** (setting `chat.plugins.marketplaces`) and install **apartment-ranking**. Requires `chat.plugins.enabled`.
+
+### GitHub Copilot CLI
+
+```bash
+copilot plugin marketplace add BarakDabach/apartment-ranking-marketplace
+copilot plugin install apartment-ranking@apartment-ranking-tools
+```
+
+### OpenAI Codex / ChatGPT desktop
+
+```bash
+codex plugin marketplace add BarakDabach/apartment-ranking-marketplace --ref main
+```
+
+Then restart, open the Plugin Directory, select **Apartment Ranking Tools**, and install **Apartment Ranking**. Update with `codex plugin marketplace upgrade apartment-ranking-tools`. From a local clone you can also run `./scripts/register-local.ps1` or `./scripts/register-local.sh`.
+
+### Any other skills-compatible agent (no plugin system)
+
+Clone the repository and copy both skills into the agent's skills folder:
 
 ```powershell
-./scripts/register-local.ps1
+./scripts/install-skills.ps1 -Agent claude        # ~/.claude/skills
+./scripts/install-skills.ps1 -Agent copilot       # ~/.copilot/skills
+./scripts/install-skills.ps1 -Agent codex         # ~/.agents/skills
+./scripts/install-skills.ps1 -Path <skills-dir>   # any other agent or a project folder (.github/skills, .claude/skills, ...)
 ```
-
-On macOS/Linux:
 
 ```bash
-./scripts/register-local.sh
+./scripts/install-skills.sh claude copilot codex
+./scripts/install-skills.sh --path <skills-dir>
 ```
 
-Then restart ChatGPT desktop / Codex, open the Plugin Directory, select **Apartment Ranking Tools**, and install **Apartment Ranking**.
+Existing copies are moved to a `skills-backup/<timestamp>/` folder next to the skills folder first, so local criteria-bank additions are not lost. For an agent with no skill support at all, point it at `plugins/apartment-ranking/skills/apartment-ranking/SKILL.md` and ask it to follow that file.
 
-## Use on any machine through Git
+### Criteria-bank changes
 
-This repository is ready to push to a Git host. Once it is in GitHub, every machine can register the same marketplace without copying the plugin files manually:
-
-```bash
-codex plugin marketplace add OWNER/REPOSITORY --ref main
-```
-
-A full HTTPS/SSH Git URL is also supported. After registration, restart ChatGPT desktop / Codex and install **Apartment Ranking** from **Apartment Ranking Tools**.
-
-To pull marketplace/plugin updates later:
-
-```bash
-codex plugin marketplace upgrade apartment-ranking-tools
-```
+The skill writes new criteria into `references/criteria-bank.md` of the copy it runs from. Plugin installs live in a managed cache that is replaced on update, so commit bank changes back to this repository and bump the version.
 
 ## Usage
 
-Primary skill:
+Ask for an apartment ranking project and the agent loads the skill automatically, or invoke it explicitly:
 
-```text
-$apartment-ranking
-```
+| Agent | Primary skill | Ingestion skill |
+| --- | --- | --- |
+| Claude Code / GitHub Copilot | `/apartment-ranking` (plugin install: `/apartment-ranking:apartment-ranking`) | `/architectural-document-ingestion` |
+| Codex | `$apartment-ranking` | `$architectural-document-ingestion` |
 
-The primary skill delegates architectural PDF/image preprocessing to the sibling skill when needed. The ingestion skill can also be called explicitly:
-
-```text
-$architectural-document-ingestion
-```
+The primary skill delegates architectural PDF/image preprocessing to the sibling skill when needed.
 
 ## Local preprocessing dependencies
 

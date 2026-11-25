@@ -1,6 +1,6 @@
 ---
 name: apartment-ranking
-description: End-to-end, cache-first pipeline for creating and maintaining a project-level apartment analysis dataset from architectural source documents (floor plans, site plans, parking layouts, cross-sections, spec booklets). For every new project, load the persistent criteria bank, select active criteria, optionally define/persist new reusable criteria, generate the standard `Lottery` + `Apartments` Excel workbook, preprocess heavy PDF/image sources through the sibling `architectural-document-ingestion` skill included in the same plugin, and analyze/write apartments building by building. Supports adding or versioning criteria later and retroactively rescoring already-analyzed buildings while reusing cached atomic facts and evidence whenever possible.
+description: End-to-end, cache-first pipeline for creating and maintaining a project-level apartment analysis dataset from architectural source documents (floor plans, site plans, parking layouts, cross-sections, spec booklets). For every new project, load the persistent criteria bank, select active criteria, optionally define/persist new reusable criteria, generate the standard `Lottery` + `Apartments` Excel workbook, preprocess heavy PDF/image sources through the sibling `architectural-document-ingestion` skill included in the same package, and analyze/write apartments building by building. Supports adding or versioning criteria later and retroactively rescoring already-analyzed buildings while reusing cached atomic facts and evidence whenever possible.
 ---
 
 # Apartment Ranking / Project Analysis Pipeline
@@ -30,6 +30,8 @@ A criterion being present in the bank does **not** mean it is automatically acti
 
 When packaging or exporting the skill, always include the current `references/criteria-bank.md`. Otherwise the skill loses criteria learned in previous projects.
 
+Edit the bank in the copy the agent actually loaded this skill from. If that copy is a managed plugin install (a marketplace/plugin cache that is replaced on update) or is read-only, tell the user that the change must also be applied to the skill's source repository, with a version bump, or it will be lost on the next update.
+
 
 ## Canonical criterion identity — strict cross-project rule
 
@@ -46,9 +48,9 @@ Do not create project-local aliases or alternate criterion descriptions in Excel
 
 ## Companion skill integration and capability routing
 
-This plugin also installs the sibling skill `architectural-document-ingestion`.
+This package ships the sibling skill `architectural-document-ingestion`. Both skills must be installed side by side (same plugin, or the same skills directory).
 
-Whenever project evidence arrives as architectural PDFs or plan images, load/invoke `architectural-document-ingestion` before repeated apartment analysis. If explicit skill invocation is supported, use `$architectural-document-ingestion`; otherwise resolve the sibling skill from the same plugin. Do not maintain a nested duplicate copy inside this skill.
+Whenever project evidence arrives as architectural PDFs or plan images, load/invoke `architectural-document-ingestion` before repeated apartment analysis. If the host supports explicit skill invocation, use it (for example `$architectural-document-ingestion` in Codex, `/architectural-document-ingestion` in Claude Code or GitHub Copilot, possibly prefixed with the plugin name such as `/apartment-ranking:architectural-document-ingestion`); otherwise read `../architectural-document-ingestion/SKILL.md` relative to this skill's directory and follow it. Do not maintain a nested duplicate copy inside this skill.
 
 Use it whenever project evidence arrives as PDFs or plan images. Its job is to create a lightweight, reusable evidence cache containing source hashes, page-level Markdown, low-resolution WebP previews, page classifications, targeted detail crops, and normalized atomic facts with evidence pointers.
 
@@ -720,7 +722,7 @@ The selected criteria determine which documents are mandatory. A custom criterio
 
 ## Phase 0A — Run the sibling ingestion skill
 
-Load and follow the `architectural-document-ingestion` skill installed by this same plugin. Prefer explicit invocation as `$architectural-document-ingestion` when the host supports it.
+Load and follow the sibling `architectural-document-ingestion` skill. Prefer the host's explicit skill invocation when available (see "Companion skill integration and capability routing"); otherwise read `../architectural-document-ingestion/SKILL.md` relative to this skill's directory.
 
 Generate or reuse a project cache before repeated analysis. Default cache contents include:
 
